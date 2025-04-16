@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { format } from "date-fns"
 import { IconoCategoria } from "./icono-categoria"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { SelectionChip } from "./ui/selection-chip"
+import { ScrollArea } from "./ui/scroll-area"
 
 interface TransaccionFormProps {
   transaccionId?: string
@@ -45,6 +46,8 @@ export function TransaccionForm({ transaccionId, onSuccess }: TransaccionFormPro
   })
 
   const tipoActual = form.watch("tipo") as TipoTransaccion
+  const categoriaIdSeleccionada = form.watch("categoriaId")
+  const cuentaIdSeleccionada = form.watch("cuentaId")
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     if (transaccionId) {
@@ -54,6 +57,8 @@ export function TransaccionForm({ transaccionId, onSuccess }: TransaccionFormPro
     }
     onSuccess?.()
   }
+
+  const categoriasFiltradas = categorias.filter((c) => c.tipo === tipoActual)
 
   return (
     <Form {...form}>
@@ -102,25 +107,29 @@ export function TransaccionForm({ transaccionId, onSuccess }: TransaccionFormPro
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Categoría</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecciona una categoría" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {categorias
-                      .filter((c) => c.tipo === tipoActual)
-                      .map((categoria) => (
-                        <SelectItem key={categoria.id} value={categoria.id} className="flex items-center gap-2">
-                          <div className="flex items-center gap-2">
+                <FormControl>
+                  <div className="space-y-2">
+                    <ScrollArea className="h-32 w-full rounded-md border p-2">
+                      <div className="flex flex-wrap gap-2 pb-2">
+                        {categoriasFiltradas.map((categoria) => (
+                          <SelectionChip
+                            key={categoria.id}
+                            selected={field.value === categoria.id}
+                            onClick={() => form.setValue("categoriaId", categoria.id)}
+                          >
                             <IconoCategoria icono={categoria.icono} color={categoria.color} size={16} />
                             <span>{categoria.nombre}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
+                          </SelectionChip>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                    {categoriasFiltradas.length === 0 && (
+                      <p className="text-sm text-muted-foreground text-center py-2">
+                        No hay categorías disponibles para este tipo de transacción
+                      </p>
+                    )}
+                  </div>
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -132,20 +141,19 @@ export function TransaccionForm({ transaccionId, onSuccess }: TransaccionFormPro
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Cuenta</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecciona una cuenta" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
+                <FormControl>
+                  <div className="flex flex-wrap gap-2">
                     {cuentas.map((cuenta) => (
-                      <SelectItem key={cuenta.id} value={cuenta.id}>
+                      <SelectionChip
+                        key={cuenta.id}
+                        selected={field.value === cuenta.id}
+                        onClick={() => form.setValue("cuentaId", cuenta.id)}
+                      >
                         {cuenta.nombre}
-                      </SelectItem>
+                      </SelectionChip>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </div>
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

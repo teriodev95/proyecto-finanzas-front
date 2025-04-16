@@ -6,6 +6,8 @@ import { ArrowDown, ArrowUp, Eye, EyeOff, Scale } from "lucide-react"
 import { useState } from "react"
 import { Button } from "./ui/button"
 import { formatCurrency } from "@/lib/utils"
+import { format } from "date-fns"
+import { es } from "date-fns/locale"
 
 export function ResumenFinanciero() {
   const {
@@ -15,9 +17,16 @@ export function ResumenFinanciero() {
     obtenerBalance,
     paginaActual,
     setPaginaActual,
+    filtroMes,
   } = useData()
 
   const [ocultarSaldo, setOcultarSaldo] = useState(false)
+
+  // Formatear el mes actual para mostrar en el título
+  const mesActual = format(filtroMes, "MMMM yyyy", { locale: es })
+    .charAt(0)
+    .toUpperCase()
+    .concat(format(filtroMes, "MMMM yyyy", { locale: es }).slice(1))
 
   return (
     <Card className="mb-6">
@@ -31,6 +40,8 @@ export function ResumenFinanciero() {
         <p className="text-4xl font-bold mb-6">{ocultarSaldo ? "******" : formatCurrency(obtenerSaldoTotal())}</p>
 
         <div className="bg-muted/50 rounded-lg p-4 space-y-4">
+          <div className="text-sm text-muted-foreground mb-2">Resumen de {mesActual}</div>
+
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
               <div className="bg-green-500/20 p-1 rounded">

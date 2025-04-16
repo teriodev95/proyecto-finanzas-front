@@ -288,7 +288,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Funciones para obtener resúmenes financieros
   const obtenerTransaccionesFiltradas = () => {
+    // Crear fecha de inicio (primer día del mes)
     const inicio = new Date(filtroMes.getFullYear(), filtroMes.getMonth(), 1)
+    // Crear fecha de fin (último día del mes)
     const fin = new Date(filtroMes.getFullYear(), filtroMes.getMonth() + 1, 0)
 
     return transacciones.filter((t) => {
