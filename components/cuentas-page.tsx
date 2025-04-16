@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useData } from "./data-provider"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -25,6 +25,82 @@ export function CuentasPage() {
   const [cuentaSeleccionada, setCuentaSeleccionada] = useState<string | null>(null)
   const [dialogAbierto, setDialogAbierto] = useState(false)
   const [alertaEliminacionAbierta, setAlertaEliminacionAbierta] = useState(false)
+
+  // Estado para la animación de count up
+  const [valoresMostrados, setValoresMostrados] = useState<Record<string, number>>({})
+  const animacionesRef = useRef<Record<string, number>>({})
+  const [animacionIniciada, setAnimacionIniciada] = useState(false)
+
+  // Iniciar la animación cuando el componente se monta
+  useEffect(() => {
+    // Inicializar los valores mostrados a 0 para cada cuenta
+    const valoresIniciales: Record<string, number> = {}
+    cuentas.forEach((cuenta) => {
+      valoresIniciales[cuenta.id] = 0
+    })
+    setValoresMostrados(valoresIniciales)
+
+    // Marcar que la animación debe iniciarse
+    setAnimacionIniciada(true)
+
+    // Limpiar las animaciones cuando el componente se desmonte
+    return () => {
+      Object.values(animacionesRef.current).forEach((id) => {
+        cancelAnimationFrame(id)
+      })
+    }
+  }, [cuentas.length]) // Reiniciar cuando cambie el número de cuentas
+
+  // Ejecutar la animación cuando se marque como iniciada
+  useEffect(() => {
+    if (!animacionIniciada) return
+
+    const duracion = 1000 // duración en ms
+    const inicio = Date.now()
+
+    // Función de easing para hacer la animación más natural
+    const easeOutQuad = (t: number) => t * (2 - t)
+
+    // Crear una copia de los valores iniciales
+    const valoresIniciales = { ...valoresMostrados }
+
+    const animar = () => {
+      const ahora = Date.now()
+      const progreso = Math.min(1, (ahora - inicio) / duracion)
+      const factorEasing = easeOutQuad(progreso)
+
+      // Actualizar cada valor mostrado
+      const nuevosValores: Record<string, number> = {}
+      cuentas.forEach((cuenta) => {
+        nuevosValores[cuenta.id] =
+          valoresIniciales[cuenta.id] + (cuenta.saldo - valoresIniciales[cuenta.id]) * factorEasing
+      })
+
+      setValoresMostrados(nuevosValores)
+
+      if (progreso < 1) {
+        // Continuar la animación
+        animacionesRef.current["principal"] = requestAnimationFrame(animar)
+      } else {
+        // Finalizar la animación
+        setAnimacionIniciada(false)
+        // Asegurarse de que los valores finales sean exactos
+        const valoresFinales: Record<string, number> = {}
+        cuentas.forEach((cuenta) => {
+          valoresFinales[cuenta.id] = cuenta.saldo
+        })
+        setValoresMostrados(valoresFinales)
+      }
+    }
+
+    // Iniciar la animación
+    animacionesRef.current["principal"] = requestAnimationFrame(animar)
+
+    // Limpiar la animación si el componente se desmonta
+    return () => {
+      cancelAnimationFrame(animacionesRef.current["principal"])
+    }
+  }, [animacionIniciada, cuentas])
 
   const handleEliminar = () => {
     if (cuentaSeleccionada) {
@@ -58,7 +134,7 @@ export function CuentasPage() {
               <div className="flex justify-between items-center">
                 <div>
                   <h3 className="font-medium">{cuenta.nombre}</h3>
-                  <p className="text-2xl font-bold">{formatCurrency(cuenta.saldo)}</p>
+                  <p className="text-2xl font-bold">{formatCurrency(valoresMostrados[cuenta.id] || 0)}</p>
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger className="focus:outline-none">

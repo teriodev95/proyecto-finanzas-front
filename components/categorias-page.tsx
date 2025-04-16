@@ -27,6 +27,7 @@ export function CategoriasPage() {
   const [dialogAbierto, setDialogAbierto] = useState(false)
   const [alertaEliminacionAbierta, setAlertaEliminacionAbierta] = useState(false)
   const [tipoActivo, setTipoActivo] = useState<TipoTransaccion>("ingreso")
+  const [nuevaCategoriaDialogAbierto, setNuevaCategoriaDialogAbierto] = useState(false)
 
   const handleEliminar = () => {
     if (categoriaSeleccionada) {
@@ -40,15 +41,15 @@ export function CategoriasPage() {
     <div className="container mx-auto p-4 pb-20">
       <div className="flex justify-between items-center mb-4">
         <h2 className="font-medium">Mis categorías</h2>
-        <Dialog>
+        <Dialog open={nuevaCategoriaDialogAbierto} onOpenChange={setNuevaCategoriaDialogAbierto}>
           <DialogTrigger asChild>
-            <Button size="sm">
+            <Button size="sm" onClick={() => setNuevaCategoriaDialogAbierto(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Nueva categoría
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
-            <CategoriaForm tipoInicial={tipoActivo} />
+            <CategoriaForm tipoInicial={tipoActivo} onSuccess={() => setNuevaCategoriaDialogAbierto(false)} />
           </DialogContent>
         </Dialog>
       </div>
