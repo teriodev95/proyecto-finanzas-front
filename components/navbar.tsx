@@ -5,9 +5,11 @@ import { TransaccionesPage } from "./transacciones-page"
 import { CuentasPage } from "./cuentas-page"
 import { CategoriasPage } from "./categorias-page"
 import { InformesPage } from "./informes-page"
-import { Settings } from "lucide-react"
+import { AcercaDePage } from "./acerca-de-page"
+import { Settings, Info } from "lucide-react"
 import { ModeToggle } from "./mode-toggle"
 import { BarChart2, CreditCard, Grid, List } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 export function Navbar() {
   const { paginaActual, setPaginaActual } = useData()
@@ -22,6 +24,8 @@ export function Navbar() {
         return <CategoriasPage />
       case "informes":
         return <InformesPage />
+      case "acerca-de":
+        return <AcercaDePage />
       default:
         return <TransaccionesPage />
     }
@@ -33,9 +37,19 @@ export function Navbar() {
         <h1 className="text-2xl font-bold">{paginaActual.charAt(0).toUpperCase() + paginaActual.slice(1)}</h1>
         <div className="flex items-center gap-2">
           <ModeToggle />
-          <button className="p-2 rounded-full hover:bg-muted">
-            <Settings className="h-5 w-5" />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="p-2 rounded-full hover:bg-muted">
+                <Settings className="h-5 w-5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setPaginaActual("acerca-de")}>
+                <Info className="h-4 w-4 mr-2" />
+                Acerca de
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 

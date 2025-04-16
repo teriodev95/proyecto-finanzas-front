@@ -31,11 +31,13 @@ export interface Cuenta {
   saldo: number
 }
 
+// Actualizar la interfaz DataContextType para incluir "acerca-de" como posible valor para paginaActual
+
 export interface DataContextType {
   transacciones: Transaccion[]
   categorias: Categoria[]
   cuentas: Cuenta[]
-  paginaActual: string
+  paginaActual: string // Puede ser "transacciones", "cuentas", "categorias", "informes" o "acerca-de"
   setPaginaActual: (pagina: string) => void
   filtroMes: Date
   setFiltroMes: (fecha: Date) => void
