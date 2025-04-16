@@ -16,6 +16,7 @@ import { ScrollArea } from "./ui/scroll-area"
 
 interface TransaccionFormProps {
   transaccionId?: string
+  tipoInicial?: TipoTransaccion
   onSuccess?: () => void
 }
 
@@ -28,7 +29,7 @@ const formSchema = z.object({
   notas: z.string().optional(),
 })
 
-export function TransaccionForm({ transaccionId, onSuccess }: TransaccionFormProps) {
+export function TransaccionForm({ transaccionId, tipoInicial = "gasto", onSuccess }: TransaccionFormProps) {
   const { transacciones, categorias, cuentas, agregarTransaccion, editarTransaccion } = useData()
 
   const transaccion = transaccionId ? transacciones.find((t) => t.id === transaccionId) : null
@@ -36,7 +37,7 @@ export function TransaccionForm({ transaccionId, onSuccess }: TransaccionFormPro
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      tipo: transaccion?.tipo || "gasto",
+      tipo: transaccion?.tipo || tipoInicial,
       monto: transaccion?.monto || 0,
       categoriaId: transaccion?.categoriaId || "",
       cuentaId: transaccion?.cuentaId || "",
@@ -65,7 +66,7 @@ export function TransaccionForm({ transaccionId, onSuccess }: TransaccionFormPro
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
           <h2 className="text-xl font-bold text-center">
-            {transaccionId ? "Editar transacción" : "Nueva transacción"}
+            {transaccionId ? "Editar transacción" : tipoActual === "ingreso" ? "Nuevo ingreso" : "Nuevo gasto"}
           </h2>
 
           <FormField
@@ -75,8 +76,18 @@ export function TransaccionForm({ transaccionId, onSuccess }: TransaccionFormPro
               <FormItem>
                 <Tabs defaultValue={field.value} onValueChange={field.onChange} className="w-full">
                   <TabsList className="grid grid-cols-2 w-full">
-                    <TabsTrigger value="ingreso">Ingreso</TabsTrigger>
-                    <TabsTrigger value="gasto">Gasto</TabsTrigger>
+                    <TabsTrigger
+                      value="ingreso"
+                      className="data-[state=active]:border-b-2 data-[state=active]:border-green-500 data-[state=active]:text-green-500"
+                    >
+                      Ingreso
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="gasto"
+                      className="data-[state=active]:border-b-2 data-[state=active]:border-red-500 data-[state=active]:text-red-500"
+                    >
+                      Gasto
+                    </TabsTrigger>
                   </TabsList>
                 </Tabs>
                 <FormMessage />
@@ -188,8 +199,16 @@ export function TransaccionForm({ transaccionId, onSuccess }: TransaccionFormPro
           />
         </div>
 
-        <Button type="submit" className="w-full">
-          {transaccionId ? "Guardar cambios" : "Agregar transacción"}
+        <Button
+          type="submit"
+          className={`w-full ${
+            tipoActual === "ingreso"
+              ? "border-green-500 text-green-500 bg-green-50 hover:bg-green-100 dark:bg-green-950/30 dark:hover:bg-green-950/50"
+              : "border-red-500 text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-950/30 dark:hover:bg-red-950/50"
+          }`}
+          variant="outline"
+        >
+          {transaccionId ? "Guardar cambios" : tipoActual === "ingreso" ? "Registrar ingreso" : "Registrar gasto"}
         </Button>
       </form>
     </Form>
