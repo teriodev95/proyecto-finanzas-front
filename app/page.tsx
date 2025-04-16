@@ -2,6 +2,7 @@ import { Navbar } from "@/components/navbar"
 import { DataProvider } from "@/components/data-provider"
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt"
 import { ServiceWorkerRegister } from "@/components/service-worker-register"
+import { UpdateNotification } from "@/components/update-notification"
 
 export default function Home() {
   return (
@@ -10,6 +11,7 @@ export default function Home() {
         <Navbar />
         <PWAInstallPrompt />
         <ServiceWorkerRegister />
+        <UpdateNotification />
       </main>
     </DataProvider>
   )
