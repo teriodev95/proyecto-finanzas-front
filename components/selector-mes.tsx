@@ -1,9 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { es } from "date-fns/locale"
 import { format, addMonths, subMonths } from "date-fns"
 
@@ -35,27 +33,9 @@ export function SelectorMes({ fecha, onChange }: SelectorMesProps) {
         <ChevronLeft className="h-4 w-4" />
       </Button>
 
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button variant="outline" className="min-w-[140px] justify-between bg-muted/40">
-            {formatoMesAnio(fecha)}
-            <ChevronDown className="h-4 w-4 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            mode="month"
-            selected={fecha}
-            onSelect={(date) => date && onChange(date)}
-            locale={es}
-            initialFocus
-            disabled={(date) => {
-              // Opcional: deshabilitar fechas futuras
-              return date > new Date()
-            }}
-          />
-        </PopoverContent>
-      </Popover>
+      <div className="min-w-[140px] px-3 py-2 rounded-md border bg-muted/40 flex justify-between items-center">
+        <span>{formatoMesAnio(fecha)}</span>
+      </div>
 
       <Button variant="ghost" size="icon" onClick={mesSiguiente} aria-label="Mes siguiente">
         <ChevronRight className="h-4 w-4" />
