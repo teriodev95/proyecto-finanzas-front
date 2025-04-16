@@ -108,15 +108,6 @@ export function Navbar() {
             <BarChart2 className="h-5 w-5" />
             <span className="text-xs mt-1">Informes</span>
           </button>
-          <button
-            onClick={() => setPaginaActual("acerca-de")}
-            className={`flex flex-col items-center justify-center w-full h-full ${
-              paginaActual === "acerca-de" ? "text-primary border-t-2 border-primary" : "text-muted-foreground"
-            }`}
-          >
-            <Info className="h-5 w-5" />
-            <span className="text-xs mt-1">Acerca de</span>
-          </button>
         </div>
       </nav>
     </div>
