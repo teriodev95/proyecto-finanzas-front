@@ -9,7 +9,8 @@ import { AcercaDePage } from "./acerca-de-page"
 import { Settings, Info } from "lucide-react"
 import { ModeToggle } from "./mode-toggle"
 import { BarChart2, CreditCard, Grid, List } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { Button } from "@/components/ui/button"
 
 export function Navbar() {
   const { paginaActual, setPaginaActual } = useData()
@@ -34,22 +35,36 @@ export function Navbar() {
   return (
     <div className="flex flex-col h-screen">
       <div className="flex justify-between items-center p-4">
-        <h1 className="text-2xl font-bold">{paginaActual.charAt(0).toUpperCase() + paginaActual.slice(1)}</h1>
+        <h1 className="text-2xl font-bold">
+          {paginaActual === "acerca-de" ? "Acerca de" : paginaActual.charAt(0).toUpperCase() + paginaActual.slice(1)}
+        </h1>
         <div className="flex items-center gap-2">
           <ModeToggle />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="p-2 rounded-full hover:bg-muted">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full">
                 <Settings className="h-5 w-5" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setPaginaActual("acerca-de")}>
-                <Info className="h-4 w-4 mr-2" />
-                Acerca de
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>Configuración</SheetTitle>
+                <SheetDescription>Ajustes y opciones de la aplicación</SheetDescription>
+              </SheetHeader>
+              <div className="mt-6 space-y-2">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    setPaginaActual("acerca-de")
+                  }}
+                >
+                  <Info className="h-4 w-4 mr-2" />
+                  Acerca de
+                </Button>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
 
@@ -92,6 +107,15 @@ export function Navbar() {
           >
             <BarChart2 className="h-5 w-5" />
             <span className="text-xs mt-1">Informes</span>
+          </button>
+          <button
+            onClick={() => setPaginaActual("acerca-de")}
+            className={`flex flex-col items-center justify-center w-full h-full ${
+              paginaActual === "acerca-de" ? "text-primary border-t-2 border-primary" : "text-muted-foreground"
+            }`}
+          >
+            <Info className="h-5 w-5" />
+            <span className="text-xs mt-1">Acerca de</span>
           </button>
         </div>
       </nav>
