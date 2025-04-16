@@ -1,0 +1,33 @@
+export const ICONOS_CATEGORIA = [
+  "Briefcase",
+  "Car",
+  "CreditCard",
+  "Film",
+  "Gift",
+  "Home",
+  "ShoppingBag",
+  "Utensils",
+  "Wallet",
+  "Zap",
+  "TrendingUp",
+  "Plane",
+  "Heart",
+  "Smartphone",
+  "Coffee",
+  "ArrowUp",
+  "ArrowDown",
+]
+
+export const COLORES_CATEGORIA = [
+  "red",
+  "green",
+  "blue",
+  "yellow",
+  "purple",
+  "pink",
+  "indigo",
+  "orange",
+  "teal",
+  "emerald",
+  "gray",
+]
