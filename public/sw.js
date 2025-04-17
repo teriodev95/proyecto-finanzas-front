@@ -1,5 +1,5 @@
 // Versión de la caché - cambiar este valor cuando se despliegue una nueva versión
-const CACHE_VERSION = "v1.1.0"
+const CACHE_VERSION = "v1.1.1"
 const CACHE_NAME = `finanzas-app-${CACHE_VERSION}`
 
 // Archivos a cachear inicialmente
