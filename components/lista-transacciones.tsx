@@ -1,7 +1,7 @@
 "use client"
 
 import { useData } from "./data-provider"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { formatCurrency } from "@/lib/utils"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
@@ -9,7 +9,7 @@ import { IconoCategoria } from "./icono-categoria"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { TransaccionForm } from "./transaccion-form"
 import { useState } from "react"
-import { Trash2 } from "lucide-react"
+import { Trash2, ArrowDown, ArrowUp } from "lucide-react"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,20 +21,66 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+// Función para agrupar transacciones por día
+const agruparPorDia = (transacciones) => {
+  const grupos = {}
+
+  transacciones.forEach((transaccion) => {
+    const fecha = new Date(transaccion.fecha)
+    const fechaKey = format(fecha, "yyyy-MM-dd")
+
+    if (!grupos[fechaKey]) {
+      grupos[fechaKey] = {
+        fecha,
+        transacciones: [],
+        totalIngresos: 0,
+        totalEgresos: 0,
+      }
+    }
+
+    grupos[fechaKey].transacciones.push(transaccion)
+
+    if (transaccion.tipo === "ingreso") {
+      grupos[fechaKey].totalIngresos += transaccion.monto
+    } else {
+      grupos[fechaKey].totalEgresos += transaccion.monto
+    }
+  })
+
+  // Convertir a array y ordenar por fecha (más reciente primero)
+  return Object.values(grupos).sort((a, b) => b.fecha - a.fecha)
+}
 
 export function ListaTransacciones() {
   const { obtenerTransaccionesFiltradas, categorias, cuentas, eliminarTransaccion } = useData()
-  const [transaccionSeleccionada, setTransaccionSeleccionada] = useState<string | null>(null)
+  const [transaccionSeleccionada, setTransaccionSeleccionada] = useState(null)
   const [dialogEdicionAbierto, setDialogEdicionAbierto] = useState(false)
   const [alertaEliminacionAbierta, setAlertaEliminacionAbierta] = useState(false)
 
   const transacciones = obtenerTransaccionesFiltradas()
+  const gruposTransacciones = agruparPorDia(transacciones)
 
   const handleEliminar = () => {
     if (transaccionSeleccionada) {
       eliminarTransaccion(transaccionSeleccionada)
       setTransaccionSeleccionada(null)
       setAlertaEliminacionAbierta(false)
+    }
+  }
+
+  const handleEditarTransaccion = (transaccionId) => {
+    setTransaccionSeleccionada(transaccionId)
+    setDialogEdicionAbierto(true)
+  }
+
+  const handleCerrarDialogEdicion = (open) => {
+    setDialogEdicionAbierto(open)
+    if (!open) {
+      setTimeout(() => {
+        setTransaccionSeleccionada(null)
+      }, 300)
     }
   }
 
@@ -45,52 +91,82 @@ export function ListaTransacciones() {
   return (
     <>
       <h2 className="font-medium mb-2">Historial de transacciones</h2>
-      <div className="space-y-3">
-        {transacciones.map((transaccion) => {
-          const categoria = categorias.find((c) => c.id === transaccion.categoriaId)
-          const cuenta = cuentas.find((c) => c.id === transaccion.cuentaId)
+      <Accordion type="multiple" className="space-y-4">
+        {gruposTransacciones.map((grupo) => {
+          const fechaKey = format(grupo.fecha, "yyyy-MM-dd")
 
           return (
-            <Card key={transaccion.id} className="overflow-hidden">
-              <CardContent className="p-0">
-                <div
-                  className="flex items-center p-4"
-                  onClick={() => {
-                    setTransaccionSeleccionada(transaccion.id)
-                    setDialogEdicionAbierto(true)
-                  }}
-                  style={{ cursor: "pointer" }}
-                >
-                  <div className="mr-3">
-                    <IconoCategoria icono={categoria?.icono || "HelpCircle"} color={categoria?.color || "gray"} />
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-medium">{categoria?.nombre || "Sin categoría"}</div>
-                    <div className="text-sm text-muted-foreground flex items-center gap-2">
-                      <span>{cuenta?.nombre || "Sin cuenta"}</span>
-                      <span className="text-xs">•</span>
-                      <span>{format(new Date(transaccion.fecha), "d MMM", { locale: es })}</span>
+            <Card key={fechaKey} className="overflow-hidden">
+              <AccordionItem value={fechaKey} className="border-none">
+                <AccordionTrigger className="p-4 hover:bg-muted/50 [&[data-state=open]>svg]:rotate-180">
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center">
+                      <div>
+                        <div className="font-medium">{format(grupo.fecha, "EEEE d 'de' MMMM", { locale: es })}</div>
+                        <div className="text-sm text-muted-foreground">{grupo.transacciones.length} transacciones</div>
+                      </div>
                     </div>
-                    {transaccion.notas && (
-                      <div className="text-sm text-muted-foreground mt-1 italic">{transaccion.notas}</div>
-                    )}
-                  </div>
-                  <div>
-                    <div
-                      className={`font-medium ${transaccion.tipo === "ingreso" ? "text-green-500" : "text-red-500"}`}
-                    >
-                      {transaccion.tipo === "ingreso" ? "+" : "-"}
-                      {formatCurrency(transaccion.monto)}
+                    <div className="flex gap-4">
+                      <div className="flex flex-col items-end">
+                        <div className="flex items-center text-green-500">
+                          <ArrowUp className="h-3 w-3 mr-1" />
+                          <span className="text-sm">{formatCurrency(grupo.totalIngresos)}</span>
+                        </div>
+                        <div className="flex items-center text-red-500">
+                          <ArrowDown className="h-3 w-3 mr-1" />
+                          <span className="text-sm">{formatCurrency(grupo.totalEgresos)}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="border-t border-border">
+                    {grupo.transacciones.map((transaccion) => {
+                      const categoria = categorias.find((c) => c.id === transaccion.categoriaId)
+                      const cuenta = cuentas.find((c) => c.id === transaccion.cuentaId)
+
+                      return (
+                        <div
+                          key={transaccion.id}
+                          className="flex items-center p-4 border-b last:border-b-0 hover:bg-muted/30 cursor-pointer"
+                          onClick={() => handleEditarTransaccion(transaccion.id)}
+                        >
+                          <div className="mr-3">
+                            <IconoCategoria
+                              icono={categoria?.icono || "HelpCircle"}
+                              color={categoria?.color || "gray"}
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-medium">{categoria?.nombre || "Sin categoría"}</div>
+                            <div className="text-sm text-muted-foreground flex items-center gap-2">
+                              <span>{cuenta?.nombre || "Sin cuenta"}</span>
+                            </div>
+                            {transaccion.notas && (
+                              <div className="text-sm text-muted-foreground mt-1 italic">{transaccion.notas}</div>
+                            )}
+                          </div>
+                          <div>
+                            <div
+                              className={`font-medium ${transaccion.tipo === "ingreso" ? "text-green-500" : "text-red-500"}`}
+                            >
+                              {transaccion.tipo === "ingreso" ? "+" : "-"}
+                              {formatCurrency(transaccion.monto)}
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
             </Card>
           )
         })}
-      </div>
+      </Accordion>
 
-      <Dialog open={dialogEdicionAbierto} onOpenChange={setDialogEdicionAbierto}>
+      <Dialog open={dialogEdicionAbierto} onOpenChange={handleCerrarDialogEdicion}>
         <DialogContent className="sm:max-w-[425px]">
           {transaccionSeleccionada && (
             <>
@@ -98,7 +174,6 @@ export function ListaTransacciones() {
                 transaccionId={transaccionSeleccionada}
                 onSuccess={() => {
                   setDialogEdicionAbierto(false)
-                  setTransaccionSeleccionada(null)
                 }}
               />
               <div className="mt-4 pt-4 border-t">

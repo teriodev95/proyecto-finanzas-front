@@ -3,13 +3,26 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "./separator"
 import { ExportarImportarDatos } from "./exportar-importar-datos"
-import { Github, ExternalLink } from "lucide-react"
+import { Github, ExternalLink, Code2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useData } from "./data-provider"
+import { Badge } from "@/components/ui/badge"
 
 // Versión y fecha de la aplicación
 const APP_VERSION = "1.0.0"
 const LAST_UPDATE = "16 de abril de 2025"
+
+// Stack tecnológico
+const TECH_STACK = [
+  { name: "React", description: "Biblioteca para interfaces de usuario" },
+  { name: "Next.js", description: "Framework de React para aplicaciones web" },
+  { name: "TypeScript", description: "JavaScript con tipado estático" },
+  { name: "Tailwind CSS", description: "Framework CSS utilitario" },
+  { name: "Shadcn UI", description: "Componentes de interfaz accesibles" },
+  { name: "LocalStorage", description: "Almacenamiento local en el navegador" },
+  { name: "PWA", description: "Aplicación web progresiva" },
+  { name: "Service Workers", description: "Caché y funcionalidad offline" },
+]
 
 export function AcercaDePage() {
   const { resetearDatos } = useData()
@@ -44,7 +57,7 @@ export function AcercaDePage() {
 
           <div className="flex space-x-2">
             <Button variant="outline" size="sm" className="gap-2" asChild>
-              <a href="https://github.com/calaverita-dev" target="_blank" rel="noopener noreferrer">
+              <a href="https://github.com/" target="_blank" rel="noopener noreferrer">
                 <Github className="h-4 w-4" />
                 GitHub
               </a>
@@ -55,6 +68,23 @@ export function AcercaDePage() {
                 Sitio web
               </a>
             </Button>
+          </div>
+
+          <Separator className="my-4" />
+
+          <h3 className="text-lg font-medium flex items-center gap-2">
+            <Code2 className="h-5 w-5" />
+            Stack Tecnológico
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {TECH_STACK.map((tech) => (
+              <div key={tech.name} className="flex items-start gap-2">
+                <Badge variant="outline" className="px-2 py-1 font-medium">
+                  {tech.name}
+                </Badge>
+                <span className="text-sm text-muted-foreground">{tech.description}</span>
+              </div>
+            ))}
           </div>
 
           <Separator className="my-4" />

@@ -13,6 +13,7 @@ import { IconoCategoria } from "./icono-categoria"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { SelectionChip } from "./ui/selection-chip"
 import { ScrollArea } from "./ui/scroll-area"
+import { useRef, useEffect } from "react"
 
 interface TransaccionFormProps {
   transaccionId?: string
@@ -31,6 +32,7 @@ const formSchema = z.object({
 
 export function TransaccionForm({ transaccionId, tipoInicial = "gasto", onSuccess }: TransaccionFormProps) {
   const { transacciones, categorias, cuentas, agregarTransaccion, editarTransaccion } = useData()
+  const montoInputRef = useRef<HTMLInputElement>(null)
 
   const transaccion = transaccionId ? transacciones.find((t) => t.id === transaccionId) : null
 
@@ -38,13 +40,25 @@ export function TransaccionForm({ transaccionId, tipoInicial = "gasto", onSucces
     resolver: zodResolver(formSchema),
     defaultValues: {
       tipo: transaccion?.tipo || tipoInicial,
-      monto: transaccion?.monto || 0,
+      monto: transaccion?.monto || undefined, // Cambiado de 0 a undefined para que el campo esté vacío por defecto
       categoriaId: transaccion?.categoriaId || "",
       cuentaId: transaccion?.cuentaId || "",
       fecha: transaccion?.fecha || format(new Date(), "yyyy-MM-dd"),
       notas: transaccion?.notas || "",
     },
   })
+
+  // Efecto para enfocar el campo de monto al abrir el modal
+  useEffect(() => {
+    // Pequeño timeout para asegurar que el modal esté completamente abierto
+    const timer = setTimeout(() => {
+      if (montoInputRef.current) {
+        montoInputRef.current.focus()
+      }
+    }, 100)
+
+    return () => clearTimeout(timer)
+  }, [])
 
   const tipoActual = form.watch("tipo") as TipoTransaccion
   const categoriaIdSeleccionada = form.watch("categoriaId")
@@ -104,7 +118,15 @@ export function TransaccionForm({ transaccionId, tipoInicial = "gasto", onSucces
                 <FormControl>
                   <div className="relative">
                     <span className="absolute left-3 top-2.5">$</span>
-                    <Input type="number" step="0.01" placeholder="0.00" className="pl-7" {...field} />
+                    <Input
+                      type="number"
+                      step="0.01"
+                      inputMode="decimal"
+                      placeholder="0.00"
+                      className="pl-7"
+                      ref={montoInputRef}
+                      {...field}
+                    />
                   </div>
                 </FormControl>
                 <FormMessage />

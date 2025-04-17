@@ -18,23 +18,25 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger
 } from "@/components/ui/alert-dialog"
 
 export function CuentasPage() {
   const { cuentas, eliminarCuenta } = useData()
-  const [cuentaSeleccionada, setCuentaSeleccionada] = useState<string | null>(null)
+  const [cuentaSeleccionada, setCuentaSeleccionada] = useState(null)
   const [dialogAbierto, setDialogAbierto] = useState(false)
   const [alertaEliminacionAbierta, setAlertaEliminacionAbierta] = useState(false)
-
+  const [cuentaParaEliminar, setCuentaParaEliminar] = useState(null) // Estado separado para la cuenta a eliminar
+  
   // Estado para la animación de count up
-  const [valoresMostrados, setValoresMostrados] = useState<Record<string, number>>({})
-  const animacionesRef = useRef<Record<string, number>>({})
+  const [valoresMostrados, setValoresMostrados] = useState({})
+  const animacionesRef = useRef({})
   const [animacionIniciada, setAnimacionIniciada] = useState(false)
 
   // Iniciar la animación cuando el componente se monta
   useEffect(() => {
     // Inicializar los valores mostrados a 0 para cada cuenta
-    const valoresIniciales: Record<string, number> = {}
+    const valoresIniciales = {}
     cuentas.forEach((cuenta) => {
       valoresIniciales[cuenta.id] = 0
     })
@@ -46,7 +48,7 @@ export function CuentasPage() {
     // Limpiar las animaciones cuando el componente se desmonte
     return () => {
       Object.values(animacionesRef.current).forEach((id) => {
-        cancelAnimationFrame(id)
+        if (id) cancelAnimationFrame(id)
       })
     }
   }, [cuentas.length]) // Reiniciar cuando cambie el número de cuentas
@@ -59,7 +61,7 @@ export function CuentasPage() {
     const inicio = Date.now()
 
     // Función de easing para hacer la animación más natural
-    const easeOutQuad = (t: number) => t * (2 - t)
+    const easeOutQuad = (t) => t * (2 - t)
 
     // Crear una copia de los valores iniciales
     const valoresIniciales = { ...valoresMostrados }
@@ -70,7 +72,7 @@ export function CuentasPage() {
       const factorEasing = easeOutQuad(progreso)
 
       // Actualizar cada valor mostrado
-      const nuevosValores: Record<string, number> = {}
+      const nuevosValores = {}
       cuentas.forEach((cuenta) => {
         nuevosValores[cuenta.id] =
           valoresIniciales[cuenta.id] + (cuenta.saldo - valoresIniciales[cuenta.id]) * factorEasing
@@ -85,7 +87,7 @@ export function CuentasPage() {
         // Finalizar la animación
         setAnimacionIniciada(false)
         // Asegurarse de que los valores finales sean exactos
-        const valoresFinales: Record<string, number> = {}
+        const valoresFinales = {}
         cuentas.forEach((cuenta) => {
           valoresFinales[cuenta.id] = cuenta.saldo
         })
@@ -98,16 +100,59 @@ export function CuentasPage() {
 
     // Limpiar la animación si el componente se desmonta
     return () => {
-      cancelAnimationFrame(animacionesRef.current["principal"])
+      if (animacionesRef.current["principal"]) {
+        cancelAnimationFrame(animacionesRef.current["principal"])
+      }
     }
   }, [animacionIniciada, cuentas])
 
-  const handleEliminar = () => {
-    if (cuentaSeleccionada) {
-      eliminarCuenta(cuentaSeleccionada)
-      setCuentaSeleccionada(null)
-      setAlertaEliminacionAbierta(false)
+  // Efecto para realizar la eliminación después de que se cierre el diálogo
+  useEffect(() => {
+    // Si el diálogo se ha cerrado y hay una cuenta para eliminar
+    if (!alertaEliminacionAbierta && cuentaParaEliminar) {
+      // Ejecutamos la eliminación después de que el diálogo se haya cerrado completamente
+      eliminarCuenta(cuentaParaEliminar)
+      // Limpiamos el estado
+      setCuentaParaEliminar(null)
     }
+  }, [alertaEliminacionAbierta, cuentaParaEliminar, eliminarCuenta])
+
+  const handleEditarCuenta = (cuentaId) => {
+    setCuentaSeleccionada(cuentaId)
+    setDialogAbierto(true)
+  }
+
+  const handleCerrarDialogEdicion = (open) => {
+    setDialogAbierto(open)
+    // Limpiar la cuenta seleccionada después de que el diálogo se haya cerrado
+    if (!open) {
+      setTimeout(() => {
+        setCuentaSeleccionada(null)
+      }, 300)
+    }
+  }
+
+  // Modificamos los manejadores para la eliminación
+  const handleSolicitarEliminacion = (cuentaId) => {
+    setCuentaSeleccionada(cuentaId)
+    setAlertaEliminacionAbierta(true)
+  }
+
+  const handleCerrarAlertaEliminacion = (open) => {
+    setAlertaEliminacionAbierta(open)
+    // Si se está cerrando la alerta, limpiar la cuenta seleccionada
+    if (!open) {
+      setTimeout(() => {
+        setCuentaSeleccionada(null)
+      }, 300)
+    }
+  }
+
+  // Este manejador simplemente marca la cuenta para eliminar
+  // La eliminación real ocurrirá en el efecto después de que se cierre el diálogo
+  const handleConfirmarEliminacion = () => {
+    setCuentaParaEliminar(cuentaSeleccionada)
+    // No cerramos el diálogo manualmente, eso lo hace AlertDialogAction
   }
 
   return (
@@ -141,21 +186,13 @@ export function CuentasPage() {
                     <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                      onClick={() => {
-                        setCuentaSeleccionada(cuenta.id)
-                        setDialogAbierto(true)
-                      }}
-                    >
+                    <DropdownMenuItem onClick={() => handleEditarCuenta(cuenta.id)}>
                       <Pencil className="h-4 w-4 mr-2" />
                       Editar
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       className="text-red-500 focus:text-red-500"
-                      onClick={() => {
-                        setCuentaSeleccionada(cuenta.id)
-                        setAlertaEliminacionAbierta(true)
-                      }}
+                      onClick={() => handleSolicitarEliminacion(cuenta.id)}
                     >
                       <Trash2 className="h-4 w-4 mr-2" />
                       Eliminar
@@ -168,21 +205,23 @@ export function CuentasPage() {
         ))}
       </div>
 
-      <Dialog open={dialogAbierto} onOpenChange={setDialogAbierto}>
+      <Dialog open={dialogAbierto} onOpenChange={handleCerrarDialogEdicion}>
         <DialogContent className="sm:max-w-[425px]">
           {cuentaSeleccionada && (
             <CuentaForm
               cuentaId={cuentaSeleccionada}
               onSuccess={() => {
                 setDialogAbierto(false)
-                setCuentaSeleccionada(null)
               }}
             />
           )}
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={alertaEliminacionAbierta} onOpenChange={setAlertaEliminacionAbierta}>
+      <AlertDialog 
+        open={alertaEliminacionAbierta} 
+        onOpenChange={handleCerrarAlertaEliminacion}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
@@ -192,7 +231,10 @@ export function CuentasPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleEliminar} className="bg-red-500 hover:bg-red-600">
+            <AlertDialogAction 
+              onClick={handleConfirmarEliminacion} 
+              className="bg-red-500 hover:bg-red-600"
+            >
               Eliminar
             </AlertDialogAction>
           </AlertDialogFooter>

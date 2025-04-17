@@ -37,6 +37,19 @@ export function CategoriasPage() {
     }
   }
 
+  const handleEditarCategoria = (categoriaId: string) => {
+    setCategoriaSeleccionada(categoriaId)
+    setDialogAbierto(true)
+  }
+
+  const handleCerrarDialogEdicion = () => {
+    setDialogAbierto(false)
+    // Importante: limpiar la categoría seleccionada después de que el diálogo se haya cerrado
+    setTimeout(() => {
+      setCategoriaSeleccionada(null)
+    }, 100)
+  }
+
   return (
     <div className="container mx-auto p-4 pb-20">
       <div className="flex justify-between items-center mb-4">
@@ -80,12 +93,7 @@ export function CategoriasPage() {
                           <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setCategoriaSeleccionada(categoria.id)
-                              setDialogAbierto(true)
-                            }}
-                          >
+                          <DropdownMenuItem onClick={() => handleEditarCategoria(categoria.id)}>
                             <Pencil className="h-4 w-4 mr-2" />
                             Editar
                           </DropdownMenuItem>
@@ -124,12 +132,7 @@ export function CategoriasPage() {
                           <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setCategoriaSeleccionada(categoria.id)
-                              setDialogAbierto(true)
-                            }}
-                          >
+                          <DropdownMenuItem onClick={() => handleEditarCategoria(categoria.id)}>
                             <Pencil className="h-4 w-4 mr-2" />
                             Editar
                           </DropdownMenuItem>
@@ -153,14 +156,13 @@ export function CategoriasPage() {
         </TabsContent>
       </Tabs>
 
-      <Dialog open={dialogAbierto} onOpenChange={setDialogAbierto}>
+      <Dialog open={dialogAbierto} onOpenChange={handleCerrarDialogEdicion}>
         <DialogContent className="sm:max-w-[425px]">
           {categoriaSeleccionada && (
             <CategoriaForm
               categoriaId={categoriaSeleccionada}
               onSuccess={() => {
                 setDialogAbierto(false)
-                setCategoriaSeleccionada(null)
               }}
             />
           )}
