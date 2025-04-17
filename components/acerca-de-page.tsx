@@ -112,8 +112,8 @@ export function AcercaDePage() {
 
           <div className="mt-2 text-sm text-muted-foreground">
             <p>
-              La exportación incluye todas tus transacciones, categorías (con sus iconos y colores) y cuentas. Guarda
-              este archivo en un lugar seguro para poder restaurar tus datos en caso de necesitarlo.
+              La exportación incluye todas tus transacciones, categorías (con sus iconos y colores) y cuentas. El
+              archivo JSON generado puede ser importado posteriormente para restaurar todos tus datos.
             </p>
           </div>
 

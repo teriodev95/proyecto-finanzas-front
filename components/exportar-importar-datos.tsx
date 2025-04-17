@@ -1,9 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import type React from "react"
+
+import { useState, useRef } from "react"
 import { useData } from "./data-provider"
 import { Button } from "@/components/ui/button"
-import { Download, Upload, AlertTriangle } from "lucide-react"
+import { Download, Upload, AlertTriangle, FileUp } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -13,17 +15,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Label } from "@/components/ui/label"
 
 export function ExportarImportarDatos() {
   const { transacciones, categorias, cuentas, resetearDatos } = useData()
-  const [datosImportar, setDatosImportar] = useState("")
   const [errorImportar, setErrorImportar] = useState<string | null>(null)
   const [importExitosa, setImportExitosa] = useState(false)
-
-  // Actualizar la función exportarDatos para incluir una descripción más clara
-  // y asegurar que se exporten todos los datos correctamente
+  const [archivoSeleccionado, setArchivoSeleccionado] = useState<File | null>(null)
+  const [dialogAbierto, setDialogAbierto] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const exportarDatos = () => {
     const datos = {
@@ -49,20 +50,35 @@ export function ExportarImportarDatos() {
     URL.revokeObjectURL(url)
   }
 
-  // Mejorar la función importarDatos para validar mejor la estructura
-  // y asegurar que se importen correctamente todos los datos
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    if (files && files.length > 0) {
+      setArchivoSeleccionado(files[0])
+      setErrorImportar(null)
+    }
+  }
 
-  const importarDatos = () => {
+  const importarDatos = async () => {
     try {
       setErrorImportar(null)
       setImportExitosa(false)
 
-      if (!datosImportar.trim()) {
-        setErrorImportar("Por favor, ingresa los datos a importar")
+      if (!archivoSeleccionado) {
+        setErrorImportar("Por favor, selecciona un archivo JSON para importar")
         return
       }
 
-      const datos = JSON.parse(datosImportar)
+      // Verificar que sea un archivo JSON
+      if (!archivoSeleccionado.name.toLowerCase().endsWith(".json")) {
+        setErrorImportar("El archivo debe ser de tipo JSON (.json)")
+        return
+      }
+
+      // Leer el contenido del archivo
+      const contenido = await archivoSeleccionado.text()
+
+      // Parsear el JSON
+      const datos = JSON.parse(contenido)
 
       // Validar estructura básica
       if (!datos.transacciones || !Array.isArray(datos.transacciones)) {
@@ -105,15 +121,33 @@ export function ExportarImportarDatos() {
       localStorage.setItem("cuentas", JSON.stringify(datos.cuentas))
 
       setImportExitosa(true)
-      setDatosImportar("")
+      setArchivoSeleccionado(null)
+
+      // Limpiar el input de archivo
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""
+      }
 
       // Recargar la página para aplicar los cambios
       setTimeout(() => {
         window.location.reload()
       }, 1500)
     } catch (error) {
-      setErrorImportar("Error al importar los datos. Verifica el formato JSON.")
+      setErrorImportar("Error al importar los datos. Verifica que el archivo sea un JSON válido.")
       console.error("Error al importar datos:", error)
+    }
+  }
+
+  const handleDialogChange = (open: boolean) => {
+    setDialogAbierto(open)
+    if (!open) {
+      // Limpiar el estado cuando se cierra el diálogo
+      setArchivoSeleccionado(null)
+      setErrorImportar(null)
+      setImportExitosa(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""
+      }
     }
   }
 
@@ -130,7 +164,7 @@ export function ExportarImportarDatos() {
           Exportar datos
         </Button>
 
-        <Dialog>
+        <Dialog open={dialogAbierto} onOpenChange={handleDialogChange}>
           <DialogTrigger asChild>
             <Button variant="outline" className="gap-2">
               <Upload className="h-4 w-4" />
@@ -141,7 +175,7 @@ export function ExportarImportarDatos() {
             <DialogHeader>
               <DialogTitle>Importar datos</DialogTitle>
               <DialogDescription>
-                Pega los datos JSON exportados previamente para restaurar tu información.
+                Selecciona un archivo JSON exportado previamente para restaurar tu información.
               </DialogDescription>
             </DialogHeader>
 
@@ -160,19 +194,46 @@ export function ExportarImportarDatos() {
               </Alert>
             )}
 
-            <Textarea
-              placeholder="Pega aquí los datos JSON exportados..."
-              value={datosImportar}
-              onChange={(e) => setDatosImportar(e.target.value)}
-              rows={10}
-              className="font-mono text-xs"
-            />
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="file-upload">Archivo JSON</Label>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 overflow-hidden">
+                  <input
+                    id="file-upload"
+                    type="file"
+                    accept=".json"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    className="block w-full text-sm text-muted-foreground
+                      file:mr-4 file:py-2 file:px-4
+                      file:rounded-md file:border-0
+                      file:text-sm file:font-medium
+                      file:bg-primary file:text-primary-foreground
+                      hover:file:bg-primary/90"
+                  />
+                </div>
+              </div>
+              {archivoSeleccionado && (
+                <p className="text-sm text-muted-foreground mt-1">Archivo seleccionado: {archivoSeleccionado.name}</p>
+              )}
+            </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setDatosImportar("")}>
-                Limpiar
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setArchivoSeleccionado(null)
+                  if (fileInputRef.current) {
+                    fileInputRef.current.value = ""
+                  }
+                }}
+              >
+                Cancelar
               </Button>
-              <Button onClick={importarDatos}>Importar</Button>
+              <Button onClick={importarDatos} disabled={!archivoSeleccionado || importExitosa}>
+                <FileUp className="h-4 w-4 mr-2" />
+                Importar
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
