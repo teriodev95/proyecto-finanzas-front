@@ -22,6 +22,9 @@ export function ExportarImportarDatos() {
   const [errorImportar, setErrorImportar] = useState<string | null>(null)
   const [importExitosa, setImportExitosa] = useState(false)
 
+  // Actualizar la función exportarDatos para incluir una descripción más clara
+  // y asegurar que se exporten todos los datos correctamente
+
   const exportarDatos = () => {
     const datos = {
       transacciones,
@@ -46,6 +49,9 @@ export function ExportarImportarDatos() {
     URL.revokeObjectURL(url)
   }
 
+  // Mejorar la función importarDatos para validar mejor la estructura
+  // y asegurar que se importen correctamente todos los datos
+
   const importarDatos = () => {
     try {
       setErrorImportar(null)
@@ -59,8 +65,37 @@ export function ExportarImportarDatos() {
       const datos = JSON.parse(datosImportar)
 
       // Validar estructura básica
-      if (!datos.transacciones || !datos.categorias || !datos.cuentas) {
-        setErrorImportar("El formato de los datos no es válido")
+      if (!datos.transacciones || !Array.isArray(datos.transacciones)) {
+        setErrorImportar("El formato de los datos no es válido: faltan transacciones")
+        return
+      }
+
+      if (!datos.categorias || !Array.isArray(datos.categorias)) {
+        setErrorImportar("El formato de los datos no es válido: faltan categorías")
+        return
+      }
+
+      if (!datos.cuentas || !Array.isArray(datos.cuentas)) {
+        setErrorImportar("El formato de los datos no es válido: faltan cuentas")
+        return
+      }
+
+      // Validar que las categorías tengan la estructura correcta
+      const categoriasValidas = datos.categorias.every(
+        (cat) => cat.id && cat.nombre && cat.tipo && cat.icono && cat.color,
+      )
+
+      if (!categoriasValidas) {
+        setErrorImportar("Algunas categorías no tienen la estructura correcta (faltan id, nombre, tipo, icono o color)")
+        return
+      }
+
+      // Validar que las transacciones tengan categorías válidas
+      const categoriasIds = new Set(datos.categorias.map((c) => c.id))
+      const transaccionesValidas = datos.transacciones.every((t) => categoriasIds.has(t.categoriaId))
+
+      if (!transaccionesValidas) {
+        setErrorImportar("Algunas transacciones hacen referencia a categorías que no existen en los datos importados")
         return
       }
 

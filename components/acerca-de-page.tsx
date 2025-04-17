@@ -110,6 +110,13 @@ export function AcercaDePage() {
 
           <ExportarImportarDatos />
 
+          <div className="mt-2 text-sm text-muted-foreground">
+            <p>
+              La exportación incluye todas tus transacciones, categorías (con sus iconos y colores) y cuentas. Guarda
+              este archivo en un lugar seguro para poder restaurar tus datos en caso de necesitarlo.
+            </p>
+          </div>
+
           <Separator className="my-4" />
 
           <h3 className="text-lg font-medium">Licencia</h3>
