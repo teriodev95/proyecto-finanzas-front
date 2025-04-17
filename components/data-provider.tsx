@@ -58,8 +58,9 @@ export interface DataContextType {
   obtenerTransaccionesFiltradas: () => Transaccion[]
 }
 
-// Categorías predeterminadas
+// Categorías predeterminadas adaptadas al contexto mexicano
 const categoriasDefault: Categoria[] = [
+  // Categorías de ingreso
   {
     id: "cat-ingreso-1",
     nombre: "Salario",
@@ -69,31 +70,110 @@ const categoriasDefault: Categoria[] = [
   },
   {
     id: "cat-ingreso-2",
-    nombre: "Inversiones",
+    nombre: "Honorarios/Freelance",
     tipo: "ingreso",
     icono: "TrendingUp",
     color: "emerald",
   },
   {
+    id: "cat-ingreso-3",
+    nombre: "Venta por apps",
+    tipo: "ingreso",
+    icono: "Smartphone",
+    color: "blue",
+  },
+  {
+    id: "cat-ingreso-4",
+    nombre: "Apoyos gubernamentales",
+    tipo: "ingreso",
+    icono: "Home",
+    color: "teal",
+  },
+  {
+    id: "cat-ingreso-5",
+    nombre: "Remesas",
+    tipo: "ingreso",
+    icono: "ArrowUp",
+    color: "indigo",
+  },
+  {
+    id: "cat-ingreso-6",
+    nombre: "Bonos",
+    tipo: "ingreso",
+    icono: "Gift",
+    color: "purple",
+  },
+
+  // Categorías de gasto
+  {
     id: "cat-gasto-1",
-    nombre: "Comida",
+    nombre: "Despensa/Súper",
     tipo: "gasto",
-    icono: "Utensils",
+    icono: "ShoppingBag",
     color: "red",
   },
   {
     id: "cat-gasto-2",
-    nombre: "Transporte",
+    nombre: "Comida a domicilio",
     tipo: "gasto",
-    icono: "Car",
+    icono: "Utensils",
     color: "orange",
   },
   {
     id: "cat-gasto-3",
+    nombre: "Transporte público",
+    tipo: "gasto",
+    icono: "Car",
+    color: "yellow",
+  },
+  {
+    id: "cat-gasto-4",
+    nombre: "Gasolina",
+    tipo: "gasto",
+    icono: "Zap",
+    color: "purple",
+  },
+  {
+    id: "cat-gasto-5",
+    nombre: "Servicios",
+    tipo: "gasto",
+    icono: "Home",
+    color: "blue",
+  },
+  {
+    id: "cat-gasto-6",
+    nombre: "Internet/Telefonía",
+    tipo: "gasto",
+    icono: "Smartphone",
+    color: "teal",
+  },
+  {
+    id: "cat-gasto-7",
+    nombre: "Renta/Hipoteca",
+    tipo: "gasto",
+    icono: "Home",
+    color: "indigo",
+  },
+  {
+    id: "cat-gasto-8",
     nombre: "Entretenimiento",
     tipo: "gasto",
     icono: "Film",
-    color: "purple",
+    color: "pink",
+  },
+  {
+    id: "cat-gasto-9",
+    nombre: "Salud",
+    tipo: "gasto",
+    icono: "Heart",
+    color: "emerald",
+  },
+  {
+    id: "cat-gasto-10",
+    nombre: "Educación",
+    tipo: "gasto",
+    icono: "Briefcase",
+    color: "blue",
   },
 ]
 
@@ -111,6 +191,427 @@ const cuentasDefault: Cuenta[] = [
   },
 ]
 
+// Datos de prueba para el mes de abril
+const transaccionesDefault: Omit<Transaccion, "id">[] = [
+  // Ingresos
+  {
+    tipo: "ingreso",
+    monto: 15000,
+    categoriaId: "cat-ingreso-1", // Salario
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-01",
+    notas: "Quincena primera de abril",
+  },
+  {
+    tipo: "ingreso",
+    monto: 15000,
+    categoriaId: "cat-ingreso-1", // Salario
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-15",
+    notas: "Quincena segunda de abril",
+  },
+  {
+    tipo: "ingreso",
+    monto: 2500,
+    categoriaId: "cat-ingreso-2", // Honorarios/Freelance
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-05",
+    notas: "Proyecto de diseño web",
+  },
+  {
+    tipo: "ingreso",
+    monto: 1800,
+    categoriaId: "cat-ingreso-3", // Venta por apps
+    cuentaId: "cuenta-1", // Efectivo
+    fecha: "2025-04-08",
+    notas: "Venta de ropa usada en Marketplace",
+  },
+  {
+    tipo: "ingreso",
+    monto: 3200,
+    categoriaId: "cat-ingreso-4", // Apoyos gubernamentales
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-10",
+    notas: "Apoyo Bienestar",
+  },
+  {
+    tipo: "ingreso",
+    monto: 5000,
+    categoriaId: "cat-ingreso-5", // Remesas
+    cuentaId: "cuenta-1", // Efectivo
+    fecha: "2025-04-12",
+    notas: "Envío familiar del extranjero",
+  },
+  {
+    tipo: "ingreso",
+    monto: 3000,
+    categoriaId: "cat-ingreso-2", // Honorarios/Freelance
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-18",
+    notas: "Consultoría de marketing",
+  },
+  {
+    tipo: "ingreso",
+    monto: 1200,
+    categoriaId: "cat-ingreso-3", // Venta por apps
+    cuentaId: "cuenta-1", // Efectivo
+    fecha: "2025-04-22",
+    notas: "Venta de libros usados",
+  },
+  {
+    tipo: "ingreso",
+    monto: 4500,
+    categoriaId: "cat-ingreso-6", // Bonos
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-25",
+    notas: "Bono por desempeño trimestral",
+  },
+  {
+    tipo: "ingreso",
+    monto: 2800,
+    categoriaId: "cat-ingreso-2", // Honorarios/Freelance
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-28",
+    notas: "Proyecto de traducción",
+  },
+
+  // Gastos - Semana 1
+  {
+    tipo: "gasto",
+    monto: 1850,
+    categoriaId: "cat-gasto-1", // Despensa/Súper
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-01",
+    notas: "Compra semanal en Soriana",
+  },
+  {
+    tipo: "gasto",
+    monto: 320,
+    categoriaId: "cat-gasto-2", // Comida a domicilio
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-01",
+    notas: "Pedido en Rappi",
+  },
+  {
+    tipo: "gasto",
+    monto: 150,
+    categoriaId: "cat-gasto-3", // Transporte público
+    cuentaId: "cuenta-1", // Efectivo
+    fecha: "2025-04-02",
+    notas: "Recarga tarjeta Metro",
+  },
+  {
+    tipo: "gasto",
+    monto: 800,
+    categoriaId: "cat-gasto-4", // Gasolina
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-02",
+    notas: "Tanque lleno Pemex",
+  },
+  {
+    tipo: "gasto",
+    monto: 250,
+    categoriaId: "cat-gasto-2", // Comida a domicilio
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-03",
+    notas: "Tacos por Didi Food",
+  },
+  {
+    tipo: "gasto",
+    monto: 450,
+    categoriaId: "cat-gasto-8", // Entretenimiento
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-03",
+    notas: "Boletos de cine",
+  },
+  {
+    tipo: "gasto",
+    monto: 120,
+    categoriaId: "cat-gasto-3", // Transporte público
+    cuentaId: "cuenta-1", // Efectivo
+    fecha: "2025-04-04",
+    notas: "Uber al trabajo",
+  },
+  {
+    tipo: "gasto",
+    monto: 350,
+    categoriaId: "cat-gasto-2", // Comida a domicilio
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-04",
+    notas: "Comida china a domicilio",
+  },
+  {
+    tipo: "gasto",
+    monto: 2500,
+    categoriaId: "cat-gasto-5", // Servicios
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-05",
+    notas: "Pago recibo CFE bimestral",
+  },
+  {
+    tipo: "gasto",
+    monto: 180,
+    categoriaId: "cat-gasto-2", // Comida a domicilio
+    cuentaId: "cuenta-1", // Efectivo
+    fecha: "2025-04-05",
+    notas: "Desayuno en cafetería",
+  },
+
+  // Gastos - Semana 2
+  {
+    tipo: "gasto",
+    monto: 1650,
+    categoriaId: "cat-gasto-1", // Despensa/Súper
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-08",
+    notas: "Compra semanal en Walmart",
+  },
+  {
+    tipo: "gasto",
+    monto: 899,
+    categoriaId: "cat-gasto-6", // Internet/Telefonía
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-08",
+    notas: "Pago mensual Telmex",
+  },
+  {
+    tipo: "gasto",
+    monto: 200,
+    categoriaId: "cat-gasto-3", // Transporte público
+    cuentaId: "cuenta-1", // Efectivo
+    fecha: "2025-04-09",
+    notas: "Pasajes de la semana",
+  },
+  {
+    tipo: "gasto",
+    monto: 750,
+    categoriaId: "cat-gasto-4", // Gasolina
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-09",
+    notas: "Gasolina Magna",
+  },
+  {
+    tipo: "gasto",
+    monto: 380,
+    categoriaId: "cat-gasto-2", // Comida a domicilio
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-10",
+    notas: "Comida en restaurante con compañeros",
+  },
+  {
+    tipo: "gasto",
+    monto: 1200,
+    categoriaId: "cat-gasto-9", // Salud
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-10",
+    notas: "Consulta médica y medicamentos",
+  },
+  {
+    tipo: "gasto",
+    monto: 150,
+    categoriaId: "cat-gasto-3", // Transporte público
+    cuentaId: "cuenta-1", // Efectivo
+    fecha: "2025-04-11",
+    notas: "Uber al médico",
+  },
+  {
+    tipo: "gasto",
+    monto: 6500,
+    categoriaId: "cat-gasto-7", // Renta/Hipoteca
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-12",
+    notas: "Pago mensual de renta",
+  },
+
+  // Gastos - Semana 3
+  {
+    tipo: "gasto",
+    monto: 1750,
+    categoriaId: "cat-gasto-1", // Despensa/Súper
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-15",
+    notas: "Compra semanal en Chedraui",
+  },
+  {
+    tipo: "gasto",
+    monto: 350,
+    categoriaId: "cat-gasto-2", // Comida a domicilio
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-15",
+    notas: "Comida en food court",
+  },
+  {
+    tipo: "gasto",
+    monto: 180,
+    categoriaId: "cat-gasto-3", // Transporte público
+    cuentaId: "cuenta-1", // Efectivo
+    fecha: "2025-04-16",
+    notas: "Pasajes de la semana",
+  },
+  {
+    tipo: "gasto",
+    monto: 850,
+    categoriaId: "cat-gasto-4", // Gasolina
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-16",
+    notas: "Gasolina Premium",
+  },
+  {
+    tipo: "gasto",
+    monto: 499,
+    categoriaId: "cat-gasto-6", // Internet/Telefonía
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-17",
+    notas: "Recarga plan celular",
+  },
+  {
+    tipo: "gasto",
+    monto: 1500,
+    categoriaId: "cat-gasto-10", // Educación
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-17",
+    notas: "Curso online de programación",
+  },
+  {
+    tipo: "gasto",
+    monto: 280,
+    categoriaId: "cat-gasto-2", // Comida a domicilio
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-18",
+    notas: "Desayuno con amigos",
+  },
+  {
+    tipo: "gasto",
+    monto: 650,
+    categoriaId: "cat-gasto-8", // Entretenimiento
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-19",
+    notas: "Suscripciones streaming",
+  },
+  {
+    tipo: "gasto",
+    monto: 420,
+    categoriaId: "cat-gasto-5", // Servicios
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-19",
+    notas: "Pago servicio de agua",
+  },
+
+  // Gastos - Semana 4
+  {
+    tipo: "gasto",
+    monto: 1950,
+    categoriaId: "cat-gasto-1", // Despensa/Súper
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-22",
+    notas: "Compra semanal en Costco",
+  },
+  {
+    tipo: "gasto",
+    monto: 300,
+    categoriaId: "cat-gasto-2", // Comida a domicilio
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-22",
+    notas: "Comida en oficina",
+  },
+  {
+    tipo: "gasto",
+    monto: 160,
+    categoriaId: "cat-gasto-3", // Transporte público
+    cuentaId: "cuenta-1", // Efectivo
+    fecha: "2025-04-23",
+    notas: "Pasajes de la semana",
+  },
+  {
+    tipo: "gasto",
+    monto: 780,
+    categoriaId: "cat-gasto-4", // Gasolina
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-23",
+    notas: "Gasolina Magna",
+  },
+  {
+    tipo: "gasto",
+    monto: 1800,
+    categoriaId: "cat-gasto-9", // Salud
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-24",
+    notas: "Análisis clínicos anuales",
+  },
+  {
+    tipo: "gasto",
+    monto: 250,
+    categoriaId: "cat-gasto-2", // Comida a domicilio
+    cuentaId: "cuenta-1", // Efectivo
+    fecha: "2025-04-24",
+    notas: "Comida rápida",
+  },
+  {
+    tipo: "gasto",
+    monto: 950,
+    categoriaId: "cat-gasto-8", // Entretenimiento
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-25",
+    notas: "Salida con amigos",
+  },
+  {
+    tipo: "gasto",
+    monto: 350,
+    categoriaId: "cat-gasto-5", // Servicios
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-26",
+    notas: "Recarga gas LP",
+  },
+  {
+    tipo: "gasto",
+    monto: 1200,
+    categoriaId: "cat-gasto-1", // Despensa/Súper
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-27",
+    notas: "Compras de fin de mes",
+  },
+  {
+    tipo: "gasto",
+    monto: 2500,
+    categoriaId: "cat-gasto-10", // Educación
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-28",
+    notas: "Pago mensual universidad",
+  },
+  {
+    tipo: "gasto",
+    monto: 780,
+    categoriaId: "cat-gasto-4", // Gasolina
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-29",
+    notas: "Gasolina fin de mes",
+  },
+  {
+    tipo: "gasto",
+    monto: 320,
+    categoriaId: "cat-gasto-2", // Comida a domicilio
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-29",
+    notas: "Cena de cumpleaños",
+  },
+  {
+    tipo: "gasto",
+    monto: 150,
+    categoriaId: "cat-gasto-3", // Transporte público
+    cuentaId: "cuenta-1", // Efectivo
+    fecha: "2025-04-30",
+    notas: "Uber al aeropuerto",
+  },
+  {
+    tipo: "gasto",
+    monto: 1500,
+    categoriaId: "cat-gasto-8", // Entretenimiento
+    cuentaId: "cuenta-2", // Banco
+    fecha: "2025-04-30",
+    notas: "Boletos para concierto",
+  },
+]
+
 // Crear el contexto
 const DataContext = createContext<DataContextType | undefined>(undefined)
 
@@ -119,7 +620,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [categorias, setCategorias] = useState<Categoria[]>(categoriasDefault)
   const [cuentas, setCuentas] = useState<Cuenta[]>(cuentasDefault)
   const [paginaActual, setPaginaActual] = useState<string>("transacciones")
-  const [filtroMes, setFiltroMes] = useState<Date>(new Date())
+  const [filtroMes, setFiltroMes] = useState<Date>(new Date(2025, 3, 1)) // Abril 2025
+
+  // Función para generar transacciones por defecto con IDs
+  const generarTransaccionesDefault = () => {
+    return transaccionesDefault.map((t) => ({
+      ...t,
+      id: uuidv4(),
+    }))
+  }
 
   // Cargar datos desde localStorage al iniciar
   useEffect(() => {
@@ -131,6 +640,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (storedTransacciones) {
           setTransacciones(JSON.parse(storedTransacciones))
+        } else {
+          // Si no hay transacciones guardadas, cargar los datos de prueba
+          setTransacciones(generarTransaccionesDefault())
         }
 
         if (storedCategorias) {
@@ -290,12 +802,13 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Función para resetear todos los datos
   const resetearDatos = () => {
-    setTransacciones([])
+    const transaccionesReset = generarTransaccionesDefault()
+    setTransacciones(transaccionesReset)
     setCategorias(categoriasDefault)
     setCuentas(cuentasDefault)
-    localStorage.removeItem("transacciones")
-    localStorage.removeItem("categorias")
-    localStorage.removeItem("cuentas")
+    localStorage.setItem("transacciones", JSON.stringify(transaccionesReset))
+    localStorage.setItem("categorias", JSON.stringify(categoriasDefault))
+    localStorage.setItem("cuentas", JSON.stringify(cuentasDefault))
   }
 
   // Funciones para obtener resúmenes financieros
