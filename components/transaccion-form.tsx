@@ -40,7 +40,7 @@ export function TransaccionForm({ transaccionId, tipoInicial = "gasto", onSucces
     resolver: zodResolver(formSchema),
     defaultValues: {
       tipo: transaccion?.tipo || tipoInicial,
-      monto: transaccion?.monto || undefined, // Cambiado de 0 a undefined para que el campo esté vacío por defecto
+      monto: transaccion ? transaccion.monto : "", // Usar cadena vacía para campo vacío pero controlado
       categoriaId: transaccion?.categoriaId || "",
       cuentaId: transaccion?.cuentaId || "",
       fecha: transaccion?.fecha || format(new Date(), "yyyy-MM-dd"),
@@ -125,7 +125,13 @@ export function TransaccionForm({ transaccionId, tipoInicial = "gasto", onSucces
                       placeholder="0.00"
                       className="pl-7"
                       ref={montoInputRef}
-                      {...field}
+                      value={field.value === "" ? "" : field.value}
+                      onChange={(e) => {
+                        const value = e.target.value
+                        field.onChange(value === "" ? "" : value)
+                      }}
+                      onBlur={field.onBlur}
+                      name={field.name}
                     />
                   </div>
                 </FormControl>
