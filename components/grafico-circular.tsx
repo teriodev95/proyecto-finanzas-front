@@ -1,5 +1,5 @@
 "use client"
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts"
 import { formatCurrency } from "@/lib/utils"
 
 interface DatoGrafico {
@@ -43,14 +43,56 @@ export function GraficoCircular({ datos }: GraficoCircularProps) {
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
+      const data = payload[0].payload
+      const porcentaje = ((data.value / datos.reduce((sum, d) => sum + d.value, 0)) * 100).toFixed(1)
+
       return (
-        <div className="bg-background border border-border p-2 rounded-md shadow-md">
-          <p className="font-medium">{payload[0].name}</p>
-          <p className="text-primary">{formatCurrency(payload[0].value)}</p>
+        <div className="bg-background border border-border p-3 rounded-md shadow-md">
+          <p className="font-medium">{data.label}</p>
+          <p className="text-primary">{formatCurrency(data.value)}</p>
+          <p className="text-sm text-muted-foreground">{porcentaje}% del total</p>
         </div>
       )
     }
     return null
+  }
+
+  // Función para renderizar etiquetas personalizadas
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }: any) => {
+    const RADIAN = Math.PI / 180
+    const radius = outerRadius * 1.1
+    const x = cx + radius * Math.cos(-midAngle * RADIAN)
+    const y = cy + radius * Math.sin(-midAngle * RADIAN)
+
+    // Solo mostrar etiquetas para segmentos con porcentaje significativo
+    if (percent < 0.05) return null
+
+    return (
+      <text
+        x={x}
+        y={y}
+        fill={getColor(datos[index].color)}
+        textAnchor={x > cx ? "start" : "end"}
+        dominantBaseline="central"
+        className="text-xs font-medium"
+      >
+        {`${(percent * 100).toFixed(0)}%`}
+      </text>
+    )
+  }
+
+  // Renderizar leyenda personalizada
+  const renderCustomLegend = ({ payload }: any) => {
+    return (
+      <ul className="flex flex-wrap justify-center gap-2 mt-4">
+        {payload.map((entry: any, index: number) => (
+          <li key={`item-${index}`} className="flex items-center gap-1">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
+            <span className="text-xs">{entry.value}</span>
+          </li>
+        ))}
+      </ul>
+    )
   }
 
   return (
@@ -60,17 +102,21 @@ export function GraficoCircular({ datos }: GraficoCircularProps) {
           data={datos}
           cx="50%"
           cy="50%"
-          labelLine={false}
+          labelLine={true}
+          label={renderCustomizedLabel}
           outerRadius={80}
           fill="#8884d8"
           dataKey="value"
           nameKey="label"
+          animationDuration={800}
+          animationBegin={0}
         >
           {datos.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={getColor(entry.color)} />
           ))}
         </Pie>
         <Tooltip content={<CustomTooltip />} />
+        <Legend content={renderCustomLegend} />
       </PieChart>
     </ResponsiveContainer>
   )
