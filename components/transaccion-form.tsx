@@ -64,11 +64,18 @@ export function TransaccionForm({ transaccionId, tipoInicial = "gasto", onSucces
   const categoriaIdSeleccionada = form.watch("categoriaId")
   const cuentaIdSeleccionada = form.watch("cuentaId")
 
+  // Modificar la función onSubmit para asegurar que la fecha se guarde correctamente
   const onSubmit = (values: z.infer<typeof formSchema>) => {
+    // Asegurarse de que la fecha se guarde en formato YYYY-MM-DD sin ajustes de zona horaria
+    const formattedValues = {
+      ...values,
+      fecha: values.fecha, // Ya está en formato YYYY-MM-DD desde el input type="date"
+    }
+
     if (transaccionId) {
-      editarTransaccion(transaccionId, values)
+      editarTransaccion(transaccionId, formattedValues)
     } else {
-      agregarTransaccion(values)
+      agregarTransaccion(formattedValues)
     }
     onSuccess?.()
   }

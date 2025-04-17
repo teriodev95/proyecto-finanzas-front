@@ -23,15 +23,21 @@ import {
 import { Button } from "@/components/ui/button"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
-// Función para agrupar transacciones por día
+// Modificar la función agruparPorDia para manejar correctamente las fechas
 const agruparPorDia = (transacciones) => {
   const grupos = {}
 
   transacciones.forEach((transaccion) => {
-    const fecha = new Date(transaccion.fecha)
-    const fechaKey = format(fecha, "yyyy-MM-dd")
+    // Crear una fecha a partir de la cadena de fecha, asegurando que se use la fecha local
+    // y no se vea afectada por la zona horaria
+    const fechaOriginal = transaccion.fecha // formato "YYYY-MM-DD"
+    const fechaKey = fechaOriginal // Usar directamente la fecha en formato YYYY-MM-DD como clave
 
     if (!grupos[fechaKey]) {
+      // Crear un objeto Date para mostrar el formato correcto, pero usar la fecha original como clave
+      const [year, month, day] = fechaOriginal.split("-").map(Number)
+      const fecha = new Date(year, month - 1, day) // month es 0-indexed en JavaScript
+
       grupos[fechaKey] = {
         fecha,
         transacciones: [],
@@ -50,7 +56,12 @@ const agruparPorDia = (transacciones) => {
   })
 
   // Convertir a array y ordenar por fecha (más reciente primero)
-  return Object.values(grupos).sort((a, b) => b.fecha - a.fecha)
+  return Object.values(grupos).sort((a, b) => {
+    // Ordenar por la fecha original en formato YYYY-MM-DD
+    const fechaA = a.fecha.getTime()
+    const fechaB = b.fecha.getTime()
+    return fechaB - fechaA
+  })
 }
 
 export function ListaTransacciones() {

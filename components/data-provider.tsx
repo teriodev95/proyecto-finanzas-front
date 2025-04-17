@@ -171,6 +171,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const nuevaTransaccion = {
       ...transaccion,
       id: uuidv4(),
+      // Asegurarse de que la fecha se guarde como string en formato YYYY-MM-DD
+      fecha: transaccion.fecha,
     }
     setTransacciones([...transacciones, nuevaTransaccion])
 
@@ -210,8 +212,18 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       editarCuenta(cuentaNueva.id, { ...cuentaNueva, saldo: nuevoSaldo })
     }
 
-    // Actualizar la transacción
-    setTransacciones(transacciones.map((t) => (t.id === id ? { ...transaccionActualizada, id } : t)))
+    // Actualizar la transacción, asegurando que la fecha se guarde correctamente
+    setTransacciones(
+      transacciones.map((t) =>
+        t.id === id
+          ? {
+              ...transaccionActualizada,
+              id,
+              fecha: transaccionActualizada.fecha,
+            }
+          : t,
+      ),
+    )
   }
 
   const eliminarTransaccion = (id: string) => {
