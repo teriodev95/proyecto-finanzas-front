@@ -1,15 +1,14 @@
 "use client"
 
-import { useData } from "./data-provider"
+import { useData } from "./api-data-provider"
 import { Card } from "@/components/ui/card"
 import { formatCurrency } from "@/lib/utils"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { IconoCategoria } from "./icono-categoria"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { TransaccionForm } from "./transaccion-form"
+import { EditarTransaccionDrawer } from "./editar-transaccion-drawer"
 import { useState } from "react"
-import { Trash2, ArrowDown, ArrowUp } from "lucide-react"
+import { ArrowDown, ArrowUp } from "lucide-react"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,7 +19,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 // Modificar la función agruparPorDia para manejar correctamente las fechas
@@ -66,33 +64,42 @@ const agruparPorDia = (transacciones) => {
 
 export function ListaTransacciones() {
   const { obtenerTransaccionesFiltradas, categorias, cuentas, eliminarTransaccion } = useData()
-  const [transaccionSeleccionada, setTransaccionSeleccionada] = useState(null)
-  const [dialogEdicionAbierto, setDialogEdicionAbierto] = useState(false)
+  const [transaccionSeleccionada, setTransaccionSeleccionada] = useState<string | null>(null)
+  const [drawerAbierto, setDrawerAbierto] = useState(false)
   const [alertaEliminacionAbierta, setAlertaEliminacionAbierta] = useState(false)
 
   const transacciones = obtenerTransaccionesFiltradas()
   const gruposTransacciones = agruparPorDia(transacciones)
 
-  const handleEliminar = () => {
+  const handleEliminar = async () => {
     if (transaccionSeleccionada) {
-      eliminarTransaccion(transaccionSeleccionada)
-      setTransaccionSeleccionada(null)
-      setAlertaEliminacionAbierta(false)
-    }
-  }
-
-  const handleEditarTransaccion = (transaccionId) => {
-    setTransaccionSeleccionada(transaccionId)
-    setDialogEdicionAbierto(true)
-  }
-
-  const handleCerrarDialogEdicion = (open) => {
-    setDialogEdicionAbierto(open)
-    if (!open) {
-      setTimeout(() => {
+      try {
+        await eliminarTransaccion(transaccionSeleccionada)
         setTransaccionSeleccionada(null)
-      }, 300)
+        setAlertaEliminacionAbierta(false)
+        setDrawerAbierto(false)
+      } catch (error) {
+        console.error('Error al eliminar transacción:', error)
+      }
     }
+  }
+
+  const handleEditarTransaccion = (transaccionId: string) => {
+    setTransaccionSeleccionada(transaccionId)
+    setDrawerAbierto(true)
+  }
+
+  const handleCerrarDrawer = () => {
+    setDrawerAbierto(false)
+    setTimeout(() => {
+      setTransaccionSeleccionada(null)
+    }, 300)
+  }
+
+  const handleAbrirAlertaEliminacion = (transaccionId: string) => {
+    setTransaccionSeleccionada(transaccionId)
+    setDrawerAbierto(false)
+    setAlertaEliminacionAbierta(true)
   }
 
   if (transacciones.length === 0) {
@@ -177,33 +184,12 @@ export function ListaTransacciones() {
         })}
       </Accordion>
 
-      <Dialog open={dialogEdicionAbierto} onOpenChange={handleCerrarDialogEdicion}>
-        <DialogContent className="sm:max-w-[425px]">
-          {transaccionSeleccionada && (
-            <>
-              <TransaccionForm
-                transaccionId={transaccionSeleccionada}
-                onSuccess={() => {
-                  setDialogEdicionAbierto(false)
-                }}
-              />
-              <div className="mt-4 pt-4 border-t">
-                <Button
-                  variant="destructive"
-                  className="w-full"
-                  onClick={() => {
-                    setDialogEdicionAbierto(false)
-                    setAlertaEliminacionAbierta(true)
-                  }}
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Eliminar transacción
-                </Button>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+      <EditarTransaccionDrawer
+        transaccionId={transaccionSeleccionada}
+        isOpen={drawerAbierto}
+        onClose={handleCerrarDrawer}
+        onEliminar={handleAbrirAlertaEliminacion}
+      />
 
       <AlertDialog open={alertaEliminacionAbierta} onOpenChange={setAlertaEliminacionAbierta}>
         <AlertDialogContent>

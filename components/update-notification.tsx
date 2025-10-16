@@ -11,6 +11,11 @@ export function UpdateNotification() {
   const [newVersion, setNewVersion] = useState<string | null>(null)
 
   useEffect(() => {
+    // Verificar si Service Worker está disponible
+    if (!("serviceWorker" in navigator)) {
+      return
+    }
+
     // Verificar si hay una versión guardada en localStorage que el usuario haya descartado
     const savedDismissedVersion = localStorage.getItem("dismissedUpdateVersion")
     if (savedDismissedVersion) {
@@ -34,11 +39,9 @@ export function UpdateNotification() {
     navigator.serviceWorker.addEventListener("message", handleMessage)
 
     // Verificar si hay una actualización disponible al cargar la página
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.ready.then((registration) => {
-        registration.update()
-      })
-    }
+    navigator.serviceWorker.ready.then((registration) => {
+      registration.update()
+    })
 
     return () => {
       navigator.serviceWorker.removeEventListener("message", handleMessage)

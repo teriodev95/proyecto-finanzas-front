@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { useData, type TipoTransaccion } from "./data-provider"
+import { useData, type TipoTransaccion } from "./api-data-provider"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { GraficoCircular } from "./grafico-circular"

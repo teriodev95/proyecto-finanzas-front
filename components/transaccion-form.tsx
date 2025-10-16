@@ -1,6 +1,6 @@
 "use client"
 
-import { useData, type TipoTransaccion } from "./data-provider"
+import { useData, type TipoTransaccion } from "./api-data-provider"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -13,7 +13,7 @@ import { IconoCategoria } from "./icono-categoria"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { SelectionChip } from "./ui/selection-chip"
 import { ScrollArea } from "./ui/scroll-area"
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
 
 interface TransaccionFormProps {
   transaccionId?: string
@@ -33,6 +33,7 @@ const formSchema = z.object({
 export function TransaccionForm({ transaccionId, tipoInicial = "gasto", onSuccess }: TransaccionFormProps) {
   const { transacciones, categorias, cuentas, agregarTransaccion, editarTransaccion } = useData()
   const montoInputRef = useRef<HTMLInputElement>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const transaccion = transaccionId ? transacciones.find((t) => t.id === transaccionId) : null
 
@@ -40,13 +41,27 @@ export function TransaccionForm({ transaccionId, tipoInicial = "gasto", onSucces
     resolver: zodResolver(formSchema),
     defaultValues: {
       tipo: transaccion?.tipo || tipoInicial,
-      monto: transaccion ? transaccion.monto : "", // Usar cadena vacía para campo vacío pero controlado
+      monto: transaccion ? transaccion.monto : 0, // Usar 0 como valor por defecto para evitar problemas con strings vacías
       categoriaId: transaccion?.categoriaId || "",
       cuentaId: transaccion?.cuentaId || "",
       fecha: transaccion?.fecha || format(new Date(), "yyyy-MM-dd"),
       notas: transaccion?.notas || "",
     },
   })
+
+  // Efecto para actualizar el formulario cuando cambie la transacción
+  useEffect(() => {
+    if (transaccion) {
+      form.reset({
+        tipo: transaccion.tipo,
+        monto: transaccion.monto,
+        categoriaId: transaccion.categoriaId,
+        cuentaId: transaccion.cuentaId,
+        fecha: transaccion.fecha,
+        notas: transaccion.notas || "",
+      })
+    }
+  }, [transaccion, form])
 
   // Efecto para enfocar el campo de monto al abrir el modal
   useEffect(() => {
@@ -64,20 +79,27 @@ export function TransaccionForm({ transaccionId, tipoInicial = "gasto", onSucces
   const categoriaIdSeleccionada = form.watch("categoriaId")
   const cuentaIdSeleccionada = form.watch("cuentaId")
 
-  // Modificar la función onSubmit para asegurar que la fecha se guarde correctamente
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    // Asegurarse de que la fecha se guarde en formato YYYY-MM-DD sin ajustes de zona horaria
-    const formattedValues = {
-      ...values,
-      fecha: values.fecha, // Ya está en formato YYYY-MM-DD desde el input type="date"
-    }
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsSubmitting(true)
 
-    if (transaccionId) {
-      editarTransaccion(transaccionId, formattedValues)
-    } else {
-      agregarTransaccion(formattedValues)
+    try {
+      const formattedValues = {
+        ...values,
+        fecha: values.fecha, // Ya está en formato YYYY-MM-DD desde el input type="date"
+      }
+
+      if (transaccionId) {
+        await editarTransaccion(transaccionId, formattedValues)
+      } else {
+        await agregarTransaccion(formattedValues)
+      }
+
+      onSuccess?.()
+    } catch (error) {
+      console.error('Error al guardar transacción:', error)
+    } finally {
+      setIsSubmitting(false)
     }
-    onSuccess?.()
   }
 
   const categoriasFiltradas = categorias.filter((c) => c.tipo === tipoActual)
@@ -132,10 +154,10 @@ export function TransaccionForm({ transaccionId, tipoInicial = "gasto", onSucces
                       placeholder="0.00"
                       className="pl-7"
                       ref={montoInputRef}
-                      value={field.value === "" ? "" : field.value}
+                      value={field.value === 0 ? "" : field.value}
                       onChange={(e) => {
                         const value = e.target.value
-                        field.onChange(value === "" ? "" : value)
+                        field.onChange(value === "" ? 0 : parseFloat(value) || 0)
                       }}
                       onBlur={field.onBlur}
                       name={field.name}
@@ -236,14 +258,18 @@ export function TransaccionForm({ transaccionId, tipoInicial = "gasto", onSucces
 
         <Button
           type="submit"
-          className={`w-full ${
-            tipoActual === "ingreso"
-              ? "border-green-500 text-green-500 bg-green-50 hover:bg-green-100 dark:bg-green-950/30 dark:hover:bg-green-950/50"
-              : "border-red-500 text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-950/30 dark:hover:bg-red-950/50"
-          }`}
-          variant="outline"
+          disabled={isSubmitting}
+          className="w-full"
+          variant={tipoActual === "ingreso" ? "default" : "destructive"}
         >
-          {transaccionId ? "Guardar cambios" : tipoActual === "ingreso" ? "Registrar ingreso" : "Registrar gasto"}
+          {isSubmitting
+            ? "Guardando..."
+            : transaccionId
+              ? "Guardar cambios"
+              : tipoActual === "ingreso"
+                ? "Registrar ingreso"
+                : "Registrar gasto"
+          }
         </Button>
       </form>
     </Form>

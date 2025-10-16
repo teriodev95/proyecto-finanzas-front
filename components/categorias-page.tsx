@@ -1,11 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { useData, type TipoTransaccion } from "./data-provider"
+import { useData, type TipoTransaccion } from "./api-data-provider"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Plus, Pencil, Trash2, MoreHorizontal } from "lucide-react"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { CategoriaForm } from "./categoria-form"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import {
@@ -62,6 +62,9 @@ export function CategoriasPage() {
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Nueva Categoría</DialogTitle>
+            </DialogHeader>
             <CategoriaForm tipoInicial={tipoActivo} onSuccess={() => setNuevaCategoriaDialogAbierto(false)} />
           </DialogContent>
         </Dialog>
@@ -158,6 +161,9 @@ export function CategoriasPage() {
 
       <Dialog open={dialogAbierto} onOpenChange={handleCerrarDialogEdicion}>
         <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Editar Categoría</DialogTitle>
+          </DialogHeader>
           {categoriaSeleccionada && (
             <CategoriaForm
               categoriaId={categoriaSeleccionada}

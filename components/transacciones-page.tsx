@@ -1,14 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { useData } from "./data-provider"
+import { useData } from "./api-data-provider"
 import { TransaccionForm } from "./transaccion-form"
 import { ListaTransacciones } from "./lista-transacciones"
 import { ResumenFinanciero } from "./resumen-financiero"
 import { SelectorMes } from "./selector-mes"
 import { Button } from "@/components/ui/button"
 import { ArrowDownCircle, ArrowUpCircle } from "lucide-react"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 
 export function TransaccionesPage() {
@@ -62,6 +62,11 @@ export function TransaccionesPage() {
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>
+              {tipoTransaccion === "ingreso" ? "Nuevo Ingreso" : "Nuevo Gasto"}
+            </DialogTitle>
+          </DialogHeader>
           <TransaccionForm tipoInicial={tipoTransaccion} onSuccess={() => setOpen(false)} />
         </DialogContent>
       </Dialog>

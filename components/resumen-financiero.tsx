@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { useData } from "./data-provider"
+import { useData } from "./api-data-provider"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowDown, ArrowUp, Eye, EyeOff, Scale } from "lucide-react"
 import { Button } from "./ui/button"

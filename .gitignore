@@ -25,3 +25,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# IDE
+.DS_Store
+.idea/
+
+# Testing
+/test-results/
+/playwright-report/

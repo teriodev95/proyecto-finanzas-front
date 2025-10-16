@@ -1,6 +1,6 @@
 "use client"
 
-import { useData, type TipoTransaccion } from "./data-provider"
+import { useData, type TipoTransaccion } from "./api-data-provider"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { IconoCategoria } from "./icono-categoria"
-import { COLORES_CATEGORIA, ICONOS_CATEGORIA } from "@/lib/constants"
+import { COLORES_CATEGORIA, ICONOS_CATEGORIA, COLOR_MAP } from "@/lib/constants"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 
@@ -148,7 +148,10 @@ export function CategoriaForm({ categoriaId, tipoInicial = "gasto", onSuccess }:
                             field.value === color ? "border-primary" : "border-muted"
                           }`}
                         >
-                          <div className={`w-6 h-6 rounded-full bg-${color}-500`}></div>
+                          <div
+                            className="w-6 h-6 rounded-full"
+                            style={{ backgroundColor: COLOR_MAP[color] }}
+                          ></div>
                         </Label>
                       </div>
                     ))}

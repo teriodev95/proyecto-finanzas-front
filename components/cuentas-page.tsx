@@ -1,12 +1,12 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { useData } from "./data-provider"
+import { useData } from "./api-data-provider"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Plus, Pencil, Trash2, MoreHorizontal } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { CuentaForm } from "./cuenta-form"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import {
@@ -53,6 +53,14 @@ export function CuentasPage() {
     }
   }, [cuentas.length]) // Reiniciar cuando cambie el número de cuentas
 
+  // Crear refs para evitar dependencias cambiantes
+  const cuentasRef = useRef(cuentas)
+
+  // Actualizar refs cuando cambien los valores
+  useEffect(() => {
+    cuentasRef.current = cuentas
+  }, [cuentas])
+
   // Ejecutar la animación cuando se marque como iniciada
   useEffect(() => {
     if (!animacionIniciada) return
@@ -73,7 +81,7 @@ export function CuentasPage() {
 
       // Actualizar cada valor mostrado
       const nuevosValores = {}
-      cuentas.forEach((cuenta) => {
+      cuentasRef.current.forEach((cuenta) => {
         nuevosValores[cuenta.id] =
           valoresIniciales[cuenta.id] + (cuenta.saldo - valoresIniciales[cuenta.id]) * factorEasing
       })
@@ -88,7 +96,7 @@ export function CuentasPage() {
         setAnimacionIniciada(false)
         // Asegurarse de que los valores finales sean exactos
         const valoresFinales = {}
-        cuentas.forEach((cuenta) => {
+        cuentasRef.current.forEach((cuenta) => {
           valoresFinales[cuenta.id] = cuenta.saldo
         })
         setValoresMostrados(valoresFinales)
@@ -104,7 +112,7 @@ export function CuentasPage() {
         cancelAnimationFrame(animacionesRef.current["principal"])
       }
     }
-  }, [animacionIniciada, cuentas])
+  }, [animacionIniciada])
 
   // Efecto para realizar la eliminación después de que se cierre el diálogo
   useEffect(() => {
@@ -167,6 +175,9 @@ export function CuentasPage() {
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Nueva Cuenta</DialogTitle>
+            </DialogHeader>
             <CuentaForm />
           </DialogContent>
         </Dialog>
@@ -207,6 +218,9 @@ export function CuentasPage() {
 
       <Dialog open={dialogAbierto} onOpenChange={handleCerrarDialogEdicion}>
         <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Editar Cuenta</DialogTitle>
+          </DialogHeader>
           {cuentaSeleccionada && (
             <CuentaForm
               cuentaId={cuentaSeleccionada}

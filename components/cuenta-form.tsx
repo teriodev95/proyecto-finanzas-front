@@ -1,6 +1,6 @@
 "use client"
 
-import { useData } from "./data-provider"
+import { useData } from "./api-data-provider"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"

@@ -1,13 +1,14 @@
 "use client"
 
-import { useData } from "./data-provider"
+import { useData } from "./api-data-provider"
 import { TransaccionesPage } from "./transacciones-page"
 import { CuentasPage } from "./cuentas-page"
 import { CategoriasPage } from "./categorias-page"
-import { InformesPage } from "./informes-page"
+import { InformesApiPage } from "./informes-api-page"
 import { AcercaDePage } from "./acerca-de-page"
 import { Settings, Info } from "lucide-react"
 import { ModeToggle } from "./mode-toggle"
+import { AuthMenu } from "./auth-menu"
 import { BarChart2, CreditCard, Grid, List } from "lucide-react"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
@@ -24,7 +25,7 @@ export function Navbar() {
       case "categorias":
         return <CategoriasPage />
       case "informes":
-        return <InformesPage />
+        return <InformesApiPage />
       case "acerca-de":
         return <AcercaDePage />
       default:
@@ -39,6 +40,7 @@ export function Navbar() {
           {paginaActual === "acerca-de" ? "Acerca de" : paginaActual.charAt(0).toUpperCase() + paginaActual.slice(1)}
         </h1>
         <div className="flex items-center gap-2">
+          <AuthMenu />
           <ModeToggle />
           <Sheet>
             <SheetTrigger asChild>
