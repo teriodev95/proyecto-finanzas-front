@@ -1,0 +1,21 @@
+# Headers para PWA
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: origin-when-cross-origin
+
+# Service Worker
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Manifesto PWA
+/manifest.json
+  Cache-Control: public, max-age=0, must-revalidate
+  Content-Type: application/manifest+json
+
+# Assets estáticos
+/icons/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable

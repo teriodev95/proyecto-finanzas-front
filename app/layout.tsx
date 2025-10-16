@@ -10,7 +10,6 @@ export const metadata: Metadata = {
   title: "App Finanzas",
   description: "Aplicación de finanzas personales minimalista",
   manifest: "/manifest.json",
-  themeColor: "#3b82f6",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -27,6 +26,10 @@ export const metadata: Metadata = {
     apple: [{ url: "/icons/icon-192x192.png" }],
   },
   generator: 'v0.dev'
+}
+
+export const viewport = {
+  themeColor: "#3b82f6",
 }
 
 export default function RootLayout({
